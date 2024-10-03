@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      POSTGRES_DB: gpa_db       # These environment variables will be used to connect to the database
+      POSTGRES_USER: gpa_user
+      POSTGRES_PASSWORD: password123
+    depends_on:
+      - db                      # Ensures PostgreSQL starts before the backend service
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend                 # Ensures the backend starts before the frontend
+
+  db:                            # PostgreSQL Service
+    image: postgres:13-alpine     # Uses the lightweight PostgreSQL Alpine image
+    environment:
+      POSTGRES_DB: gpa_db         # Database name
+      POSTGRES_USER: gpa_user     # Database user
+      POSTGRES_PASSWORD: password123  # Password for the user
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Mounts a volume to persist the data on the host machine
+    ports:
+      - "5432:5432"               # Exposes the PostgreSQL database on port 5432
+
+volumes:
+  postgres_data:                   # Declares a volume to persist PostgreSQL data
